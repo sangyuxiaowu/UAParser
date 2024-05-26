@@ -32,13 +32,13 @@ namespace Sang.UAParser
         /// <remarks>
         /// 顺序很重要，因为有些浏览器标识符可能包含在其他标识符中
         /// UC 浏览器，Vivo 浏览器，小米浏览器，夸克浏览器，联想浏览器，遨游浏览器，115 浏览器，极速浏览器，华为浏览，世界之窗浏览器
-        /// 360企业安全浏览器，奇安信可信浏览器，UOS 专业版，UOS
+        /// 360浏览器[x3]，用友浏览器，奇安信可信浏览器，UOS 专业版，UOS
         /// 微信内置，QQ 浏览器，搜狗浏览器，Opera浏览器，Edge 浏览器，火狐浏览器，谷歌浏览器，Safari 浏览器，IE 浏览器
         /// </remarks>
         private static List<string> browserIdentifiers = new List<string>
         {
            "UCBrowser","VivoBrowser","MiuiBrowser","QuarkPC","SLBrowser","Maxthon","115Browser","JiSu","HBPC","TheWorld",
-           "QIHU 360ENT","Qaxbrowser","UOS Professional","UOS",
+           "QIHU 360ENT","QIHU 360SE","QIHU 360EE","UBrowser","Qaxbrowser","UOS Professional","UOS",
            "MicroMessenger", "QQBrowser", "MetaSr", "OPR","Opera", "Edg", "Firefox", "Chrome" ,"Safari", "MSIE"
         };
 
@@ -49,6 +49,13 @@ namespace Sang.UAParser
         /// 从右向左匹配，匹配到第一个即可，部分浏览器无版本号
         /// </remarks>
         private static Regex browserRegex = new Regex($@"(?:({string.Join("|", browserIdentifiers)})[/\s]?(\d+(\.\d+)*)?)",RegexOptions.RightToLeft);
+
+
+        /// <summary>
+        /// Chrome 浏览器正则表达式模式
+        /// 用于修正 Safari
+        /// </summary>
+        private static Regex chromeRegex = new Regex(@"(?:(Chrome)[/\s]?(\d+(\.\d+)*)?)", RegexOptions.Compiled);
 
 
         /// <summary>
@@ -199,6 +206,19 @@ namespace Sang.UAParser
             else if (clientInfo.Browser == "MSIE")
             {
                 clientInfo.Browser = "IE";
+            }else if(clientInfo.Browser == "Safari")
+            {
+                // Chrome 会被 Safari 识别，修正
+                var chromeMatch = chromeRegex.Match(clientInfo.UserAgent);
+                if(chromeMatch.Success)
+                {
+                    clientInfo.Browser = "Chrome";
+                    clientInfo.BrowserVersion = chromeMatch.Groups[2].Value;
+                }
+            }else if(clientInfo.Browser.StartsWith("QIHU 360"))
+            {
+                clientInfo.BrowserVersion = clientInfo.Browser.Replace("QIHU 360","");
+                clientInfo.Browser = "360";
             }
             return clientInfo;
         }

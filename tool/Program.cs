@@ -50,7 +50,7 @@ internal class Program
         var lines = File.ReadAllLines(uafile);
         var csv = new StringBuilder();
         csv.AppendLine("Browser,BrowserVersion,OS,OSVersion,DeviceType");
-        var uaParser = new HttpUserAgent();
+        var uaParser = new UAParser();
 
         foreach (var line in lines)
         {

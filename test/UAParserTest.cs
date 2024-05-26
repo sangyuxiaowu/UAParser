@@ -10,7 +10,7 @@ namespace Sang.UAParser.Test
         // 添加更多的测试数据
         public void TestMyMethod(string useragent, string browser, string browserVersion, string os, string osVersion, string deviceType)
         {
-            var ua = new HttpUserAgent().Parse(useragent);
+            var ua = new UAParser().Parse(useragent);
             Assert.Equal(browser, ua.Browser);
             Assert.Equal(browserVersion, ua.BrowserVersion);
             Assert.Equal(os, ua.OS);

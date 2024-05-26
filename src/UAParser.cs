@@ -6,7 +6,7 @@ namespace Sang.UAParser
     /// <summary>
     /// HTTP User Agent 解析类
     /// </summary>
-    public record class HttpUserAgent
+    public class UAParser
     {
 
         /// <summary>
@@ -66,10 +66,10 @@ namespace Sang.UAParser
         private static Regex osRegex = new Regex($@"(?:({string.Join("|", osIdentifiers)})[/\s]?(\d+([._]\d+)*))",RegexOptions.Compiled);
 
         /// <summary>
-        /// 创建一个 HttpUserAgent 实例
+        /// 创建一个 UAParser 实例
         /// Sang.UAParser
         /// </summary>
-        public HttpUserAgent()
+        public UAParser()
         {
 
         }
@@ -208,8 +208,8 @@ namespace Sang.UAParser
         /// 设置浏览器 Identifiers
         /// </summary>
         /// <param name="identifiers">Identifiers</param>
-        /// <returns>HttpUserAgent</returns>
-        public HttpUserAgent SetBrowserIdentifiers(List<string> identifiers)
+        /// <returns>UAParser</returns>
+        public UAParser SetBrowserIdentifiers(List<string> identifiers)
         {
             browserIdentifiers = identifiers;
             browserRegex = new Regex($@"(?:({string.Join("|", browserIdentifiers)})[/\s]?(\d+(\.\d+)*)?)",RegexOptions.RightToLeft);
@@ -220,8 +220,8 @@ namespace Sang.UAParser
         /// 设置操作系统 Identifiers
         /// </summary>
         /// <param name="identifiers">Identifiers</param>
-        /// <returns>HttpUserAgent</returns>
-        public HttpUserAgent SetOSIdentifiers(List<string> identifiers)
+        /// <returns>UAParser</returns>
+        public UAParser SetOSIdentifiers(List<string> identifiers)
         {
             osIdentifiers = identifiers;
             osRegex = new Regex($@"(?:({string.Join("|", osIdentifiers)})[/\s]?(\d+([._]\d+)*))",RegexOptions.Compiled);

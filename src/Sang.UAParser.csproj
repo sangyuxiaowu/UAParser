@@ -1,0 +1,31 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <TargetFrameworks>net8.0;net6.0</TargetFrameworks>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+	<PackageReadmeFile>readme.md</PackageReadmeFile>
+	<Version>1.0.0</Version>
+	<Authors>SangSQ(桑世强)</Authors>
+	<RepositoryType>git</RepositoryType>
+	<RepositoryUrl>https://github.com/sangyuxiaowu/UAParser</RepositoryUrl>
+	<PackageProjectUrl>https://github.com/sangyuxiaowu/UAParser</PackageProjectUrl>
+	<PackageTags>UAParser;HttpUserAgent;BrowserVersion;OSVersion;UserAgent</PackageTags>
+	<Description>A simple user agent parser for .NET.</Description>
+	<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+	<PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\LICENSE.txt">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+    <None Include="..\readme.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
+
+</Project>

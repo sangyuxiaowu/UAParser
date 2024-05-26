@@ -50,10 +50,11 @@ internal class Program
         var lines = File.ReadAllLines(uafile);
         var csv = new StringBuilder();
         csv.AppendLine("Browser,BrowserVersion,OS,OSVersion,DeviceType");
+        var uaParser = new HttpUserAgent();
 
         foreach (var line in lines)
         {
-            var ua = new HttpUserAgent(line);
+            var ua = uaParser.Parse(line);
             csv.AppendLine($"{ua.Browser},{ua.BrowserVersion},{ua.OS},{ua.OSVersion},{ua.DeviceType}");
         }
         File.WriteAllText(savefile, csv.ToString());

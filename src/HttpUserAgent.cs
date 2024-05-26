@@ -66,177 +66,141 @@ namespace Sang.UAParser
         private static Regex osRegex = new Regex($@"(?:({string.Join("|", osIdentifiers)})[/\s]?(\d+([._]\d+)*))",RegexOptions.Compiled);
 
         /// <summary>
-        /// 浏览器
-        /// </summary>
-        public string Browser { get; set; } = "Other";
-
-        /// <summary>
-        /// 浏览器版本
-        /// </summary>
-        public string BrowserVersion { get; set; } = string.Empty;
-
-        /// <summary>
-        /// 操作系统
-        /// </summary>
-        public string OS { get; set; } = "Other";
-        /// <summary>
-        /// 操作系统版本
-        /// </summary>
-        public string OSVersion { get; set; } = string.Empty;
-
-        /// <summary>
-        /// 设备类型
-        /// Desktop, Mobile, Spider, Bot, Other
-        /// </summary>
-        public string DeviceType { get; set; } = "Other";
-
-        /// <summary>
-        /// 原始 User Agent
-        /// </summary>
-        public string UserAgent { get; set; } = string.Empty;
-
-        /// <summary>
         /// 创建一个 HttpUserAgent 实例
         /// Sang.UAParser
         /// </summary>
-        /// <param name="httpUserAgent">UserAgent 字符串</param>
-        public HttpUserAgent(string httpUserAgent = "")
+        public HttpUserAgent()
         {
-            if (!string.IsNullOrWhiteSpace(httpUserAgent))
-            {
-                Parse(httpUserAgent);
-            }
+
         }
 
         /// <summary>
         /// 解析 UserAgent
         /// </summary>
         /// <param name="httpUserAgent">UserAgent 字符串</param>
-        public void Parse(string httpUserAgent = "")
+        public ClientInfo Parse(string httpUserAgent = "")
         {
-            Browser = "Other";
-            BrowserVersion = string.Empty;
-            OS = "Other";
-            OSVersion = string.Empty;
-            DeviceType = "Other";
-            UserAgent = httpUserAgent;
+            var clientInfo = new ClientInfo(){
+                UserAgent = httpUserAgent
+            };
 
             if (string.IsNullOrWhiteSpace(httpUserAgent))
             {
-                return;
+                return clientInfo;
             } 
 
             // 优先判断是否是爬虫，爬虫也会加入普通浏览器标识符，所以要先判断
-            var spiderMatch = spiderRegex.Match(UserAgent);
+            var spiderMatch = spiderRegex.Match(clientInfo.UserAgent);
             if (spiderMatch.Success)
             {
-                Browser = spiderMatch.Groups[1].Value;
-                BrowserVersion = spiderMatch.Groups[2].Value;
-                DeviceType = "Spider";
+                clientInfo.Browser = spiderMatch.Groups[1].Value;
+                clientInfo.BrowserVersion = spiderMatch.Groups[2].Value;
+                clientInfo.DeviceType = "Spider";
             }
 
             // 不是爬虫，解析浏览器
-            if(Browser == "Other"){
-                var browserMatch = browserRegex.Match(UserAgent);
+            if(clientInfo.Browser == "Other"){
+                var browserMatch = browserRegex.Match(clientInfo.UserAgent);
                 if (browserMatch.Success)
                 {
-                    Browser = browserMatch.Groups[1].Value;
-                    BrowserVersion = browserMatch.Groups[2].Value;
+                    clientInfo.Browser = browserMatch.Groups[1].Value;
+                    clientInfo.BrowserVersion = browserMatch.Groups[2].Value;
                 }
             }
 
             // 对于未知浏览器， UserAgent 字符串在 50 以内 或者带着爬虫协议的 ，按照爬虫匹配一次
-            if(Browser == "Other" && (UserAgent.Length < 51 || UserAgent.Contains("+http") ) )
+            if(clientInfo.Browser == "Other" && (clientInfo.UserAgent.Length < 51 || clientInfo.UserAgent.Contains("+http") ) )
             {
-                var normalSpiderMatch = normalSpiderRegex.Match(UserAgent);
+                var normalSpiderMatch = normalSpiderRegex.Match(clientInfo.UserAgent);
                 if (normalSpiderMatch.Success)
                 {
-                    Browser = normalSpiderMatch.Groups[1].Value;
-                    BrowserVersion = normalSpiderMatch.Groups[2].Value;
-                    DeviceType = "Bot";
+                    clientInfo.Browser = normalSpiderMatch.Groups[1].Value;
+                    clientInfo.BrowserVersion = normalSpiderMatch.Groups[2].Value;
+                    clientInfo.DeviceType = "Bot";
                 }
             }
             
             // 解析操作系统
-            var osMatch = osRegex.Match(UserAgent);
+            var osMatch = osRegex.Match(clientInfo.UserAgent);
             if (osMatch.Success)
             {
-                OS = osMatch.Groups[1].Value;
-                OSVersion = osMatch.Groups[2].Value;
+                clientInfo.OS = osMatch.Groups[1].Value;
+                clientInfo.OSVersion = osMatch.Groups[2].Value;
             }
 
-            if (OS == "Other" && (UserAgent.Contains("Linux") || UserAgent.Contains("X11;")) )
+            if (clientInfo.OS == "Other" && (clientInfo.UserAgent.Contains("Linux") || clientInfo.UserAgent.Contains("X11;")) )
             {
-                OS = "Linux";
+                clientInfo.OS = "Linux";
             }
 
 
             // 判断设备类型
-            if(DeviceType == "Other")
+            if(clientInfo.DeviceType == "Other")
             {
-                if(OS == "Android" || OS == "iPhone OS" || UserAgent.Contains("Mobile"))
+                if(clientInfo.OS == "Android" || clientInfo.OS == "iPhone OS" || clientInfo.UserAgent.Contains("Mobile"))
                 {
-                    DeviceType = "Mobile";
-                }else if(OS == "Windows NT" || OS == "Mac OS X" || OS == "Linux")
+                    clientInfo.DeviceType = "Mobile";
+                }else if(clientInfo.OS == "Windows NT" || clientInfo.OS == "Mac OS X" || clientInfo.OS == "Linux")
                 {
-                    DeviceType = "Desktop";
+                    clientInfo.DeviceType = "Desktop";
                 }
             }
 
             // 特殊处理
-            if(OS=="Windows NT")
+            if(clientInfo.OS=="Windows NT")
             {
-                OS = "Windows";
+                clientInfo.OS = "Windows";
                 // 特殊处理 Windows NT 版本号
-                if(OSVersion.StartsWith("10.0"))
+                if(clientInfo.OSVersion.StartsWith("10.0"))
                 {
-                    OSVersion = "10";
+                    clientInfo.OSVersion = "10";
                 }
-                else if(OSVersion.StartsWith("6.3"))
+                else if(clientInfo.OSVersion.StartsWith("6.3"))
                 {
-                    OSVersion = "8.1";
+                    clientInfo.OSVersion = "8.1";
                 }
-                else if(OSVersion.StartsWith("6.2"))
+                else if(clientInfo.OSVersion.StartsWith("6.2"))
                 {
-                    OSVersion = "8";
+                    clientInfo.OSVersion = "8";
                 }
-                else if(OSVersion.StartsWith("6.1"))
+                else if(clientInfo.OSVersion.StartsWith("6.1"))
                 {
-                    OSVersion = "7";
+                    clientInfo.OSVersion = "7";
                 }
-                else if(OSVersion.StartsWith("6.0"))
+                else if(clientInfo.OSVersion.StartsWith("6.0"))
                 {
-                    OSVersion = "Vista";
+                    clientInfo.OSVersion = "Vista";
                 }
-                else if(OSVersion.StartsWith("5.1"))
+                else if(clientInfo.OSVersion.StartsWith("5.1"))
                 {
-                    OSVersion = "XP";
+                    clientInfo.OSVersion = "XP";
                 }
-            }else if(OS == "Mac OS X"){
-                OS = "macOS";
-                OSVersion = OSVersion.Replace("_",".");
-            }else if(OS == "iPhone OS"){
-                OS = "iOS";
-                OSVersion = OSVersion.Replace("_",".");
+            }else if(clientInfo.OS == "Mac OS X"){
+                clientInfo.OS = "macOS";
+                clientInfo.OSVersion = clientInfo.OSVersion.Replace("_",".");
+            }else if(clientInfo.OS == "iPhone OS"){
+                clientInfo.OS = "iOS";
+                clientInfo.OSVersion = clientInfo.OSVersion.Replace("_",".");
             }
 
             // 特殊处理浏览器
-            if (Browser == "OPR")
+            if (clientInfo.Browser == "OPR")
             {
-                Browser = "Opera";
+                clientInfo.Browser = "Opera";
             }
-            else if (Browser == "Edg")
+            else if (clientInfo.Browser == "Edg")
             {
-                Browser = "Edge";
+                clientInfo.Browser = "Edge";
             }
-            else if (Browser == "MetaSr")
+            else if (clientInfo.Browser == "MetaSr")
             {
-                Browser = "Sogou";
+                clientInfo.Browser = "Sogou";
             }
-            else if (Browser == "MSIE")
+            else if (clientInfo.Browser == "MSIE")
             {
-                Browser = "IE";
+                clientInfo.Browser = "IE";
             }
+            return clientInfo;
         }
 
 

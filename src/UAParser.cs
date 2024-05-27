@@ -195,9 +195,13 @@ namespace Sang.UAParser
                 {
                     clientInfo.OSVersion = "Vista";
                 }
-                else if(clientInfo.OSVersion.StartsWith("5.1"))
+                else if(clientInfo.OSVersion.StartsWith("5.2") || clientInfo.OSVersion.StartsWith("5.1"))
                 {
                     clientInfo.OSVersion = "XP";
+                }else if(clientInfo.OSVersion.StartsWith("5.0")){
+                    clientInfo.OSVersion = "2000";
+                }else{
+                    clientInfo.OSVersion = "Unknown";
                 }
             }else if(clientInfo.OS == "Mac OS X"){
                 clientInfo.OS = "macOS";

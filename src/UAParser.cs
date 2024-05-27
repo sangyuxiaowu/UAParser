@@ -24,7 +24,16 @@ namespace Sang.UAParser
         /// </summary>
         /// <remarks>
         /// 按照 名称/版本号 的格式匹配一次
+        /// </remarks>
         private static Regex normalSpiderRegex = new Regex(@"(?:([a-zA-Z-]+)[/\s]?(\d+(\.\d+)*))", RegexOptions.Compiled);
+
+        /// <summary>
+        /// 程序爬虫正则表达式模式2
+        /// </summary>
+        /// <remarks>
+        /// 按照 名称 的格式匹配一次，要求完整匹配
+        /// </remarks>
+        private static Regex normalSpiderRegex2 = new Regex(@"^[a-zA-Z][a-zA-Z\s-]{0,28}[a-zA-Z]$", RegexOptions.Compiled);
 
         /// <summary>
         /// 浏览器标识符
@@ -115,15 +124,23 @@ namespace Sang.UAParser
                 }
             }
 
-            // 对于未知浏览器， UserAgent 字符串在 50 以内 或者带着爬虫协议的 ，按照爬虫匹配一次
-            if(clientInfo.Browser == "Other" && (clientInfo.UserAgent.Length < 51 || clientInfo.UserAgent.Contains("+http") ) )
+            // 对于未知浏览器， UserAgent 字符串在 61 以内 或者带着爬虫协议的 ，按照爬虫匹配一次
+            if(clientInfo.Browser == "Other" && (clientInfo.UserAgent.Length < 61 || clientInfo.UserAgent.Contains("http") ) )
             {
                 var normalSpiderMatch = normalSpiderRegex.Match(clientInfo.UserAgent);
-                if (normalSpiderMatch.Success)
+                if (normalSpiderMatch.Success && normalSpiderMatch.Groups[1].Value!="Mozilla")
                 {
                     clientInfo.Browser = normalSpiderMatch.Groups[1].Value;
                     clientInfo.BrowserVersion = normalSpiderMatch.Groups[2].Value;
                     clientInfo.DeviceType = "Bot";
+                }else{
+                    // 有些爬虫没有版本号，再匹配一次，完整匹配
+                    var normalSpiderMatch2 = normalSpiderRegex2.Match(clientInfo.UserAgent);
+                    if(normalSpiderMatch2.Success)
+                    {
+                        clientInfo.Browser = clientInfo.UserAgent;
+                        clientInfo.DeviceType = "Bot";
+                    }
                 }
             }
             

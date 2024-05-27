@@ -49,13 +49,13 @@ internal class Program
     {
         var lines = File.ReadAllLines(uafile);
         var csv = new StringBuilder();
-        csv.AppendLine("Browser,BrowserVersion,OS,OSVersion,DeviceType");
+        csv.AppendLine("Browser,BrowserVersion,OS,OSVersion,DeviceType,Info");
         var uaParser = new UAParser();
 
         foreach (var line in lines)
         {
             var ua = uaParser.Parse(line);
-            csv.AppendLine($"{ua.Browser},{ua.BrowserVersion},{ua.OS},{ua.OSVersion},{ua.DeviceType}");
+            csv.AppendLine($"{ua.Browser},{ua.BrowserVersion},{ua.OS},{ua.OSVersion},{ua.DeviceType},{(ua.Browser == "Other" ? line:"")}");
         }
         File.WriteAllText(savefile, csv.ToString());
     }

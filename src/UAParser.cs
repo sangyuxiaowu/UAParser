@@ -240,6 +240,10 @@ namespace Sang.UAParser
             {
                 clientInfo.BrowserVersion = clientInfo.Browser.Replace("QIHU 360","");
                 clientInfo.Browser = "360";
+            }else if(clientInfo.Browser == "UOS Professional")
+            {
+                clientInfo.Browser = "UOS";
+                clientInfo.BrowserVersion = "Professional";
             }
             return clientInfo;
         }

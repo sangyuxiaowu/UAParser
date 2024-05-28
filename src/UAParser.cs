@@ -21,7 +21,7 @@ namespace Sang.UAParser
         /// 将 "bot" 或 "spider" ， "-" 和其后面的任何字符，版本号，三个部分分别提取出来
         /// </remarks>
         //private static Regex spiderRegex = new Regex(@"((?:bot|spider))(?:-(.*))?[/\s]?(\d+(\.\d+)*)?");
-        private static Regex spiderRegex = new Regex(@"([a-zA-Z-]*?(?:bot|spider)[a-zA-Z0-9-]*)(?:\/(\d+(\.\d+)*))?", RegexOptions.IgnoreCase);
+        private static Regex spiderRegex = new Regex(@"\b([a-zA-Z-\s]*?(?:bot|spider)[a-zA-Z0-9-]*)(?:\/(\d+(\.\d+)*))?", RegexOptions.IgnoreCase);
 
 
         /// <summary>

@@ -54,6 +54,10 @@ internal class Program
 
         foreach (var line in lines)
         {
+            if (string.IsNullOrWhiteSpace(line))
+            {
+                continue;
+            }
             var ua = uaParser.Parse(line);
             csv.AppendLine($"{ua.Browser},{ua.BrowserVersion},{ua.OS},{ua.OSVersion},{ua.DeviceType},{(ua.Browser == "Other" ? line:"")}");
         }

@@ -116,7 +116,7 @@ namespace Sang.UAParser
                 var spiderMatch = spiderRegex.Match(clientInfo.UserAgent);
                 if (spiderMatch.Success)
                 {
-                    clientInfo.Browser = spiderMatch.Groups[1].Value;
+                    clientInfo.Browser = spiderMatch.Groups[1].Value.Trim();
                     clientInfo.BrowserVersion = spiderMatch.Groups[2].Value;
                     clientInfo.DeviceType = "Spider";
                 }

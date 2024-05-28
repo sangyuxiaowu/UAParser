@@ -30,7 +30,7 @@ namespace Sang.UAParser
         /// <remarks>
         /// 按照 名称(可含数字，单不能纯数字)/版本号(可带v前缀) 的格式匹配一次
         /// </remarks>
-        private static Regex normalSpiderRegex = new Regex(@"(?:([a-zA-Z0-9]*[a-zA-Z][a-zA-Z0-9]*)[/\s]?(v?\d+(\.\d+)*))", RegexOptions.Compiled);
+        private static Regex normalBotRegex = new Regex(@"(?:([a-zA-Z0-9-]*[a-zA-Z][a-zA-Z0-9-]*)[/]?(v?\d+(\.\d+)*))", RegexOptions.Compiled);
 
         /// <summary>
         /// 程序爬虫正则表达式模式2
@@ -38,7 +38,7 @@ namespace Sang.UAParser
         /// <remarks>
         /// 按照 名称 的格式匹配一次，要求完整匹配
         /// </remarks>
-        private static Regex normalSpiderRegex2 = new Regex(@"^[a-zA-Z][a-zA-Z\s-]{0,28}[a-zA-Z]$", RegexOptions.Compiled);
+        private static Regex botRegex = new Regex(@"^[a-zA-Z][a-zA-Z\s-]{0,28}[a-zA-Z]$", RegexOptions.Compiled);
 
         /// <summary>
         /// 浏览器标识符
@@ -136,16 +136,18 @@ namespace Sang.UAParser
             // 对于未知浏览器， UserAgent 字符串在 61 以内 或者带着爬虫协议的 ，按照爬虫匹配一次
             if(parseSpider && clientInfo.Browser == "Other" && (clientInfo.UserAgent.Length < 61 || clientInfo.UserAgent.Contains("http") ) )
             {
-                var normalSpiderMatch = normalSpiderRegex.Match(clientInfo.UserAgent);
-                if (normalSpiderMatch.Success && normalSpiderMatch.Groups[1].Value!="Mozilla")
+                // 修正 UserAgent 匹配，排除 Mozilla 干扰
+                var tmpAgent = clientInfo.UserAgent.StartsWith("Mozilla") ? clientInfo.UserAgent.Substring(8) : clientInfo.UserAgent;
+                var normalBotMatch = normalBotRegex.Match(tmpAgent);
+                if (normalBotMatch.Success)
                 {
-                    clientInfo.Browser = normalSpiderMatch.Groups[1].Value;
-                    clientInfo.BrowserVersion = normalSpiderMatch.Groups[2].Value;
+                    clientInfo.Browser = normalBotMatch.Groups[1].Value;
+                    clientInfo.BrowserVersion = normalBotMatch.Groups[2].Value;
                     clientInfo.DeviceType = "Bot";
                 }else{
                     // 有些爬虫没有版本号，再匹配一次，完整匹配
-                    var normalSpiderMatch2 = normalSpiderRegex2.Match(clientInfo.UserAgent);
-                    if(normalSpiderMatch2.Success)
+                    var botMatch = botRegex.Match(clientInfo.UserAgent);
+                    if(botMatch.Success)
                     {
                         clientInfo.Browser = clientInfo.UserAgent;
                         clientInfo.DeviceType = "Bot";

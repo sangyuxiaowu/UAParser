@@ -30,7 +30,7 @@ namespace Sang.UAParser
         /// <remarks>
         /// 按照 名称(可含数字，单不能纯数字)/版本号(可带v前缀) 的格式匹配一次
         /// </remarks>
-        private static Regex normalBotRegex = new Regex(@"(?:([a-zA-Z0-9-]*[a-zA-Z][a-zA-Z0-9-]*)[/]?(v?\d+(\.\d+)*))", RegexOptions.Compiled);
+        private static Regex normalBotRegex = new Regex(@"(?:([a-zA-Z0-9-]*[a-zA-Z][a-zA-Z0-9-]*)[/\s](v?\d+(\.\d+)*))", RegexOptions.Compiled);
 
         /// <summary>
         /// 程序爬虫正则表达式模式2

@@ -8,6 +8,11 @@ namespace Sang.UAParser
     /// </summary>
     public class UAParser
     {
+        /// <summary>
+        /// 是否解析爬虫
+        /// </summary>
+        private static bool parseSpider = true;
+
 
         /// <summary>
         /// 爬虫正则表达式模式
@@ -106,13 +111,17 @@ namespace Sang.UAParser
             } 
 
             // 优先判断是否是爬虫，爬虫也会加入普通浏览器标识符，所以要先判断
-            var spiderMatch = spiderRegex.Match(clientInfo.UserAgent);
-            if (spiderMatch.Success)
+            if(parseSpider)
             {
-                clientInfo.Browser = spiderMatch.Groups[1].Value;
-                clientInfo.BrowserVersion = spiderMatch.Groups[2].Value;
-                clientInfo.DeviceType = "Spider";
+                var spiderMatch = spiderRegex.Match(clientInfo.UserAgent);
+                if (spiderMatch.Success)
+                {
+                    clientInfo.Browser = spiderMatch.Groups[1].Value;
+                    clientInfo.BrowserVersion = spiderMatch.Groups[2].Value;
+                    clientInfo.DeviceType = "Spider";
+                }
             }
+            
 
             // 不是爬虫，解析浏览器
             if(clientInfo.Browser == "Other"){
@@ -125,7 +134,7 @@ namespace Sang.UAParser
             }
 
             // 对于未知浏览器， UserAgent 字符串在 61 以内 或者带着爬虫协议的 ，按照爬虫匹配一次
-            if(clientInfo.Browser == "Other" && (clientInfo.UserAgent.Length < 61 || clientInfo.UserAgent.Contains("http") ) )
+            if(parseSpider && clientInfo.Browser == "Other" && (clientInfo.UserAgent.Length < 61 || clientInfo.UserAgent.Contains("http") ) )
             {
                 var normalSpiderMatch = normalSpiderRegex.Match(clientInfo.UserAgent);
                 if (normalSpiderMatch.Success && normalSpiderMatch.Groups[1].Value!="Mozilla")
@@ -270,6 +279,17 @@ namespace Sang.UAParser
         {
             osIdentifiers = identifiers;
             osRegex = new Regex($@"(?:({string.Join("|", osIdentifiers)})[/\s]?(\d+([._]\d+)*))",RegexOptions.Compiled);
+            return this;
+        }
+
+        /// <summary>
+        /// 设置是否解析爬虫
+        /// </summary>
+        /// <param name="parse">是否解析爬虫</param>
+        /// <returns>UAParser</returns>
+        public UAParser SetParseSpider(bool parse)
+        {
+            parseSpider = parse;
             return this;
         }
 

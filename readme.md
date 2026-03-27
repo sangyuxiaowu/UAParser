@@ -33,3 +33,40 @@ Sang.UAParser supports parsing the following types of information from a user ag
 - OS: The operating system that the user agent is running on, such as Windows, macOS, Linux, etc.
 - OS Version: The version of the operating system.
 - Device Type: The type of device that the user agent is running on. This can be one of the following: Desktop, Mobile, Spider, Bot, Other.
+
+## Benchmark
+
+Use BenchmarkDotNet for stable throughput and allocation measurements.
+
+Run:
+
+```bash
+dotnet run -c Release --project benchmark/Sang.UAParser.Benchmarks.csproj
+```
+
+The benchmark project includes these scenarios:
+
+- ParseChrome: desktop browser UA parsing
+- ParseOpenHarmony: OpenHarmony mobile UA parsing
+- ParseSpider: bot UA parsing
+- ParseWholeDataset: full pass over tool/data/uatest.txt
+
+Focus on these numbers:
+
+- Mean: average execution time
+- Allocated: memory allocated per operation
+- ParseWholeDataset: best indicator for real throughput after parser changes
+
+Example results on Windows 11, .NET 10.0.2, Intel Core i5-13600K:
+
+| Method | Mean | Allocated |
+| --- | ---: | ---: |
+| ParseChrome | 4.096 us | 1504 B |
+| ParseOpenHarmony | 4.902 us | 2224 B |
+| ParseSpider | 2.804 us | 752 B |
+| ParseWholeDataset | 8.137 ms | 2965332 B |
+
+Notes:
+
+- ParseWholeDataset uses the sample set in tool/data/uatest.txt
+- Benchmark results depend on CPU, .NET runtime version, and power plan

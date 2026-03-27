@@ -2,11 +2,11 @@
 
   <PropertyGroup>
     <OutputType>Library</OutputType>
-    <TargetFrameworks>net8.0;net6.0</TargetFrameworks>
+    <TargetFrameworks>net8.0;net10.0</TargetFrameworks>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
 	<PackageReadmeFile>readme.md</PackageReadmeFile>
-	<Version>1.0.5</Version>
+	<Version>1.1.5</Version>
 	<Authors>SangSQ(桑世强)</Authors>
 	<RepositoryType>git</RepositoryType>
 	<RepositoryUrl>https://github.com/sangyuxiaowu/UAParser</RepositoryUrl>
@@ -15,9 +15,14 @@
 	<Description>A simple user agent parser for .NET.</Description>
 	<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 	<PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+  <PackageIcon>ico.png</PackageIcon>
   </PropertyGroup>
 
   <ItemGroup>
+    <None Include="..\ico.png">
+			<Pack>true</Pack>
+			<PackagePath>\</PackagePath>
+		</None>
     <None Include="..\LICENSE.txt">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>

@@ -20,7 +20,7 @@ namespace Sang.UAParser
         private static readonly string[] DefaultBrowserIdentifiers =
         {
             "UCBrowser", "VivoBrowser", "MiuiBrowser", "QuarkPC", "SLBrowser", "Maxthon", "115Browser", "JiSu", "HBPC", "TheWorld",
-            "QIHU 360ENT", "QIHU 360SE", "QIHU 360EE", "UBrowser", "Qaxbrowser", "UOS Professional", "UOS",
+            "QIHU 360ENT", "QIHU 360SE", "QIHU 360EE", "UBrowser", "Qaxbrowser", "HuaweiBrowser", "UOS Professional", "UOS",
             "MicroMessenger", "QQBrowser", "QQ", "MetaSr", "OPR", "Opera", "Edg", "Firefox", "Chrome", "Safari", "MSIE"
         };
 
@@ -28,12 +28,12 @@ namespace Sang.UAParser
         /// 操作系统标识符
         /// </summary>
         /// <remarks>
-        /// Windows NT, iPhone OS, Mac OS X, Android
+        /// Windows NT, iPhone OS, Mac OS X, Android, OpenHarmony
         /// Linux 为一大类，一般不包含版本号，单独处理
         /// </remarks>
         private static readonly string[] DefaultOsIdentifiers =
         {
-            "Windows NT", "iPhone OS", "Mac OS X", "Android"
+            "Windows NT", "iPhone OS", "Mac OS X", "Android", "OpenHarmony"
         };
 
         /// <summary>
@@ -48,7 +48,7 @@ namespace Sang.UAParser
         /// 默认操作系统正则表达式模式
         /// </summary>
         /// <remarks>
-        /// Windows NT, iPhone OS, Mac OS X, Android
+        /// Windows NT, iPhone OS, Mac OS X, Android, OpenHarmony
         /// Linux 为一大类，一般不包含版本号，单独处理
         /// </remarks>
         private static readonly Regex DefaultOsRegex = CreateOsRegex(DefaultOsIdentifiers);
@@ -82,6 +82,12 @@ namespace Sang.UAParser
         /// 用于修正 Safari
         /// </summary>
         private static readonly Regex ChromeRegex = new Regex(@"(?:(Chrome)[/\s]?(\d+(\.\d+)*)?)", RegexOptions.Compiled | RegexOptions.CultureInvariant);
+
+        /// <summary>
+        /// HuaweiBrowser 浏览器正则表达式模式
+        /// 用于修正 Safari
+        /// </summary>
+        private static readonly Regex HuaweiBrowserRegex = new Regex(@"(?:(HuaweiBrowser)[/\s]?(\d+(\.\d+)*)?)", RegexOptions.Compiled | RegexOptions.CultureInvariant);
 
         /// <summary>
         /// 是否解析爬虫
@@ -232,6 +238,9 @@ namespace Sang.UAParser
             }else if(clientInfo.OS == "iPhone OS"){
                 clientInfo.OS = "iOS";
                 clientInfo.OSVersion = clientInfo.OSVersion.Replace("_",".");
+            }else if(clientInfo.OS == "OpenHarmony"){
+                clientInfo.OS = "HarmonyOS";
+                clientInfo.OSVersion = clientInfo.OSVersion.Replace("_", ".");
             }
 
             // 特殊处理浏览器
@@ -252,12 +261,21 @@ namespace Sang.UAParser
                 clientInfo.Browser = "IE";
             }else if(clientInfo.Browser == "Safari")
             {
-                // Chrome 会被 Safari 识别，修正
-                var chromeMatch = ChromeRegex.Match(clientInfo.UserAgent);
-                if(chromeMatch.Success)
+                var huaweiBrowserMatch = HuaweiBrowserRegex.Match(clientInfo.UserAgent);
+                if(huaweiBrowserMatch.Success)
                 {
-                    clientInfo.Browser = "Chrome";
-                    clientInfo.BrowserVersion = chromeMatch.Groups[2].Value;
+                    clientInfo.Browser = "HuaweiBrowser";
+                    clientInfo.BrowserVersion = huaweiBrowserMatch.Groups[2].Value;
+                }
+                else
+                {
+                    // Chrome 会被 Safari 识别，修正
+                    var chromeMatch = ChromeRegex.Match(clientInfo.UserAgent);
+                    if(chromeMatch.Success)
+                    {
+                        clientInfo.Browser = "Chrome";
+                        clientInfo.BrowserVersion = chromeMatch.Groups[2].Value;
+                    }
                 }
             }else if(clientInfo.Browser.StartsWith("QIHU 360"))
             {

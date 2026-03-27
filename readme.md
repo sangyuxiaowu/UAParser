@@ -1,12 +1,16 @@
 # Sang.UAParser
 
-A simple user agent parser for .NET.
+Sang.UAParser is a fast User Agent parser for .NET.
+
+It parses browser, browser version, operating system, OS version, device type, bot, spider, OpenHarmony, and HarmonyOS related user agent strings.
 
 ## Installation
 
 ```bash
 dotnet add package Sang.UAParser
 ```
+
+Keywords: UAParser, User Agent Parser, HttpUserAgent, Browser Detection, OS Detection, Device Detection, Bot Detection, Spider Detection.
 
 ## Usage
 
@@ -33,6 +37,13 @@ Sang.UAParser supports parsing the following types of information from a user ag
 - OS: The operating system that the user agent is running on, such as Windows, macOS, Linux, etc.
 - OS Version: The version of the operating system.
 - Device Type: The type of device that the user agent is running on. This can be one of the following: Desktop, Mobile, Spider, Bot, Other.
+
+## Supported Scenarios
+
+- Parse browser and browser version from common desktop and mobile user agents
+- Parse operating system and OS version for Windows, macOS, iOS, Android, Linux, and OpenHarmony based user agents
+- Detect spiders, bots, and crawlers before regular browser matching
+- Classify client device type as Desktop, Mobile, Spider, Bot, or Other
 
 ## Benchmark
 

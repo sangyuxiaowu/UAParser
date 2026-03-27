@@ -11,8 +11,8 @@
 	<RepositoryType>git</RepositoryType>
 	<RepositoryUrl>https://github.com/sangyuxiaowu/UAParser</RepositoryUrl>
 	<PackageProjectUrl>https://github.com/sangyuxiaowu/UAParser</PackageProjectUrl>
-	<PackageTags>UAParser;HttpUserAgent;BrowserVersion;OSVersion;UserAgent</PackageTags>
-	<Description>A simple user agent parser for .NET.</Description>
+  <PackageTags>uaparser;user-agent;useragent;http-user-agent;browser;browser-detection;browser-version;os;os-detection;device-detection;bot;spider;crawler;dotnet;net;openharmony;harmonyos</PackageTags>
+  <Description>Fast User Agent parser for .NET. Parse browser, browser version, operating system, OS version, device type, bot, spider, OpenHarmony, and HarmonyOS related user agent strings.</Description>
 	<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 	<PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
   <PackageIcon>ico.png</PackageIcon>

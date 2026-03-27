@@ -9,38 +9,6 @@ namespace Sang.UAParser
     public class UAParser
     {
         /// <summary>
-        /// 是否解析爬虫
-        /// </summary>
-        private static bool parseSpider = true;
-
-
-        /// <summary>
-        /// 爬虫正则表达式模式
-        /// </summary>
-        /// <remarks>
-        /// 将 "bot" 或 "spider" ， "-" 和其后面的任何字符，版本号，三个部分分别提取出来
-        /// </remarks>
-        //private static Regex spiderRegex = new Regex(@"((?:bot|spider))(?:-(.*))?[/\s]?(\d+(\.\d+)*)?");
-        private static Regex spiderRegex = new Regex(@"\b([a-zA-Z-\s]*?(?:bot|spider)[a-zA-Z0-9-]*)(?:\/(\d+(\.\d+)*))?", RegexOptions.IgnoreCase);
-
-
-        /// <summary>
-        /// 程序爬虫正则表达式模式
-        /// </summary>
-        /// <remarks>
-        /// 按照 名称(可含数字，单不能纯数字)/版本号(可带v前缀) 的格式匹配一次
-        /// </remarks>
-        private static Regex normalBotRegex = new Regex(@"(?:([a-zA-Z0-9-]*[a-zA-Z][a-zA-Z0-9-]*)[/\s](v?\d+(\.\d+)*))", RegexOptions.Compiled);
-
-        /// <summary>
-        /// 程序爬虫正则表达式模式2
-        /// </summary>
-        /// <remarks>
-        /// 按照 名称 的格式匹配一次，要求完整匹配
-        /// </remarks>
-        private static Regex botRegex = new Regex(@"^[a-zA-Z][a-zA-Z\s-]{0,28}[a-zA-Z]$", RegexOptions.Compiled);
-
-        /// <summary>
         /// 浏览器标识符
         /// </summary>
         /// <remarks>
@@ -49,28 +17,12 @@ namespace Sang.UAParser
         /// 360浏览器[x3]，用友浏览器，奇安信可信浏览器，UOS 专业版，UOS
         /// 微信内置，QQ 浏览器，QQ，搜狗浏览器，Opera浏览器，Edge 浏览器，火狐浏览器，谷歌浏览器，Safari 浏览器，IE 浏览器
         /// </remarks>
-        private static List<string> browserIdentifiers = new List<string>
+        private static readonly string[] DefaultBrowserIdentifiers =
         {
-           "UCBrowser","VivoBrowser","MiuiBrowser","QuarkPC","SLBrowser","Maxthon","115Browser","JiSu","HBPC","TheWorld",
-           "QIHU 360ENT","QIHU 360SE","QIHU 360EE","UBrowser","Qaxbrowser","UOS Professional","UOS",
-           "MicroMessenger", "QQBrowser","QQ", "MetaSr", "OPR","Opera", "Edg", "Firefox", "Chrome" ,"Safari", "MSIE"
+            "UCBrowser", "VivoBrowser", "MiuiBrowser", "QuarkPC", "SLBrowser", "Maxthon", "115Browser", "JiSu", "HBPC", "TheWorld",
+            "QIHU 360ENT", "QIHU 360SE", "QIHU 360EE", "UBrowser", "Qaxbrowser", "UOS Professional", "UOS",
+            "MicroMessenger", "QQBrowser", "QQ", "MetaSr", "OPR", "Opera", "Edg", "Firefox", "Chrome", "Safari", "MSIE"
         };
-
-        /// <summary>
-        /// 浏览器正则表达式模式
-        /// </summary>
-        /// <remarks>
-        /// 从右向左匹配，匹配到第一个即可，部分浏览器无版本号
-        /// </remarks>
-        private static Regex browserRegex = new Regex($@"(?:({string.Join("|", browserIdentifiers)})\b[/\s]?(\d+(\.\d+)*)?)",RegexOptions.RightToLeft);
-
-
-        /// <summary>
-        /// Chrome 浏览器正则表达式模式
-        /// 用于修正 Safari
-        /// </summary>
-        private static Regex chromeRegex = new Regex(@"(?:(Chrome)[/\s]?(\d+(\.\d+)*)?)", RegexOptions.Compiled);
-
 
         /// <summary>
         /// 操作系统标识符
@@ -79,12 +31,72 @@ namespace Sang.UAParser
         /// Windows NT, iPhone OS, Mac OS X, Android
         /// Linux 为一大类，一般不包含版本号，单独处理
         /// </remarks>
-        private static List<string> osIdentifiers = new List<string>
+        private static readonly string[] DefaultOsIdentifiers =
         {
-            "Windows NT","iPhone OS", "Mac OS X", "Android"
+            "Windows NT", "iPhone OS", "Mac OS X", "Android"
         };
 
-        private static Regex osRegex = new Regex($@"(?:({string.Join("|", osIdentifiers)})[/\s]?(\d+([._]\d+)*))",RegexOptions.Compiled);
+        /// <summary>
+        /// 默认浏览器正则表达式模式
+        /// </summary>
+        /// <remarks>
+        /// 从右向左匹配，匹配到第一个即可，部分浏览器无版本号
+        /// </remarks>
+        private static readonly Regex DefaultBrowserRegex = CreateBrowserRegex(DefaultBrowserIdentifiers);
+
+        /// <summary>
+        /// 默认操作系统正则表达式模式
+        /// </summary>
+        /// <remarks>
+        /// Windows NT, iPhone OS, Mac OS X, Android
+        /// Linux 为一大类，一般不包含版本号，单独处理
+        /// </remarks>
+        private static readonly Regex DefaultOsRegex = CreateOsRegex(DefaultOsIdentifiers);
+
+        /// <summary>
+        /// 爬虫正则表达式模式
+        /// </summary>
+        /// <remarks>
+        /// 将 bot 或 spider、版本号分别提取出来
+        /// </remarks>
+        private static readonly Regex SpiderRegex = new Regex(@"\b([a-zA-Z-\s]*?(?:bot|spider)[a-zA-Z0-9-]*)(?:\/(\d+(\.\d+)*))?", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
+
+        /// <summary>
+        /// 程序爬虫正则表达式模式
+        /// </summary>
+        /// <remarks>
+        /// 按照 名称(可含数字，但不能纯数字)/版本号(可带 v 前缀) 的格式匹配一次
+        /// </remarks>
+        private static readonly Regex NormalBotRegex = new Regex(@"(?:([a-zA-Z0-9-]*[a-zA-Z][a-zA-Z0-9-]*)[/\s](v?\d+(\.\d+)*))", RegexOptions.Compiled | RegexOptions.CultureInvariant);
+
+        /// <summary>
+        /// 程序爬虫正则表达式模式2
+        /// </summary>
+        /// <remarks>
+        /// 按照 名称 的格式匹配一次，要求完整匹配
+        /// </remarks>
+        private static readonly Regex BotRegex = new Regex(@"^[a-zA-Z][a-zA-Z\s-]{0,28}[a-zA-Z]$", RegexOptions.Compiled | RegexOptions.CultureInvariant);
+
+        /// <summary>
+        /// Chrome 浏览器正则表达式模式
+        /// 用于修正 Safari
+        /// </summary>
+        private static readonly Regex ChromeRegex = new Regex(@"(?:(Chrome)[/\s]?(\d+(\.\d+)*)?)", RegexOptions.Compiled | RegexOptions.CultureInvariant);
+
+        /// <summary>
+        /// 是否解析爬虫
+        /// </summary>
+        private bool parseSpider = true;
+
+        /// <summary>
+        /// 当前实例使用的浏览器正则表达式模式
+        /// </summary>
+        private Regex browserRegex = DefaultBrowserRegex;
+
+        /// <summary>
+        /// 当前实例使用的操作系统正则表达式模式
+        /// </summary>
+        private Regex osRegex = DefaultOsRegex;
 
         /// <summary>
         /// 创建一个 UAParser 实例
@@ -113,7 +125,7 @@ namespace Sang.UAParser
             // 优先判断是否是爬虫，爬虫也会加入普通浏览器标识符，所以要先判断
             if(parseSpider)
             {
-                var spiderMatch = spiderRegex.Match(clientInfo.UserAgent);
+                var spiderMatch = SpiderRegex.Match(clientInfo.UserAgent);
                 if (spiderMatch.Success)
                 {
                     clientInfo.Browser = spiderMatch.Groups[1].Value.Trim();
@@ -137,8 +149,8 @@ namespace Sang.UAParser
             if(parseSpider && clientInfo.Browser == "Other" && (clientInfo.UserAgent.Length < 61 || clientInfo.UserAgent.Contains("http") ) )
             {
                 // 修正 UserAgent 匹配，排除 Mozilla 干扰
-                var tmpAgent = clientInfo.UserAgent.StartsWith("Mozilla") ? clientInfo.UserAgent.Substring(8) : clientInfo.UserAgent;
-                var normalBotMatch = normalBotRegex.Match(tmpAgent);
+                var tmpAgent = clientInfo.UserAgent.StartsWith("Mozilla", StringComparison.Ordinal) ? clientInfo.UserAgent[8..] : clientInfo.UserAgent;
+                var normalBotMatch = NormalBotRegex.Match(tmpAgent);
                 if (normalBotMatch.Success)
                 {
                     clientInfo.Browser = normalBotMatch.Groups[1].Value;
@@ -146,7 +158,7 @@ namespace Sang.UAParser
                     clientInfo.DeviceType = "Bot";
                 }else{
                     // 有些爬虫没有版本号，再匹配一次，完整匹配
-                    var botMatch = botRegex.Match(clientInfo.UserAgent);
+                    var botMatch = BotRegex.Match(clientInfo.UserAgent);
                     if(botMatch.Success)
                     {
                         clientInfo.Browser = clientInfo.UserAgent;
@@ -163,7 +175,7 @@ namespace Sang.UAParser
                 clientInfo.OSVersion = osMatch.Groups[2].Value;
             }
 
-            if (clientInfo.OS == "Other" && (clientInfo.UserAgent.Contains("Linux") || clientInfo.UserAgent.Contains("X11;")) )
+            if (clientInfo.OS == "Other" && (clientInfo.UserAgent.Contains("Linux", StringComparison.Ordinal) || clientInfo.UserAgent.Contains("X11;", StringComparison.Ordinal)) )
             {
                 clientInfo.OS = "Linux";
             }
@@ -241,7 +253,7 @@ namespace Sang.UAParser
             }else if(clientInfo.Browser == "Safari")
             {
                 // Chrome 会被 Safari 识别，修正
-                var chromeMatch = chromeRegex.Match(clientInfo.UserAgent);
+                var chromeMatch = ChromeRegex.Match(clientInfo.UserAgent);
                 if(chromeMatch.Success)
                 {
                     clientInfo.Browser = "Chrome";
@@ -267,8 +279,8 @@ namespace Sang.UAParser
         /// <returns>UAParser</returns>
         public UAParser SetBrowserIdentifiers(List<string> identifiers)
         {
-            browserIdentifiers = identifiers;
-            browserRegex = new Regex($@"(?:({string.Join("|", browserIdentifiers)})[/\s]?(\d+(\.\d+)*)?)",RegexOptions.RightToLeft);
+            ArgumentNullException.ThrowIfNull(identifiers);
+            browserRegex = CreateBrowserRegex(identifiers);
             return this;
         }
 
@@ -279,8 +291,8 @@ namespace Sang.UAParser
         /// <returns>UAParser</returns>
         public UAParser SetOSIdentifiers(List<string> identifiers)
         {
-            osIdentifiers = identifiers;
-            osRegex = new Regex($@"(?:({string.Join("|", osIdentifiers)})[/\s]?(\d+([._]\d+)*))",RegexOptions.Compiled);
+            ArgumentNullException.ThrowIfNull(identifiers);
+            osRegex = CreateOsRegex(identifiers);
             return this;
         }
 
@@ -293,6 +305,27 @@ namespace Sang.UAParser
         {
             parseSpider = parse;
             return this;
+        }
+
+        /// <summary>
+        /// 根据浏览器标识符创建正则表达式模式
+        /// </summary>
+        /// <remarks>
+        /// 从右向左匹配，匹配到第一个即可，部分浏览器无版本号
+        /// </remarks>
+        private static Regex CreateBrowserRegex(IEnumerable<string> identifiers)
+        {
+            var pattern = string.Join("|", identifiers.Select(Regex.Escape));
+            return new Regex($@"(?:({pattern})\b[/\s]?(\d+(\.\d+)*)?)", RegexOptions.Compiled | RegexOptions.CultureInvariant | RegexOptions.RightToLeft);
+        }
+
+        /// <summary>
+        /// 根据操作系统标识符创建正则表达式模式
+        /// </summary>
+        private static Regex CreateOsRegex(IEnumerable<string> identifiers)
+        {
+            var pattern = string.Join("|", identifiers.Select(Regex.Escape));
+            return new Regex($@"(?:({pattern})[/\s]?(\d+([._]\d+)*))", RegexOptions.Compiled | RegexOptions.CultureInvariant);
         }
 
     }

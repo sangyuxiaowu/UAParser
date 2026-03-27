@@ -19,5 +19,33 @@ namespace Sang.UAParser.Test
             Assert.Equal(osVersion, ua.OSVersion);
             Assert.Equal(deviceType, ua.DeviceType);
         }
+
+        [Fact]
+        public void SetParseSpider_ShouldOnlyAffectCurrentInstance()
+        {
+            const string userAgent = "Googlebot/2.1";
+
+            var parserWithoutSpider = new UAParser().SetParseSpider(false);
+            var defaultParser = new UAParser();
+
+            var withoutSpider = parserWithoutSpider.Parse(userAgent);
+            var withSpider = defaultParser.Parse(userAgent);
+
+            Assert.Equal("Other", withoutSpider.Browser);
+            Assert.Equal("Other", withoutSpider.DeviceType);
+            Assert.Equal("Googlebot", withSpider.Browser);
+            Assert.Equal("Spider", withSpider.DeviceType);
+        }
+
+        [Fact]
+        public void SetBrowserIdentifiers_ShouldEscapeRegexMetaCharacters()
+        {
+            var parser = new UAParser().SetBrowserIdentifiers(["My.Browser"]);
+
+            var result = parser.Parse("Mozilla/5.0 My.Browser/1.2.3");
+
+            Assert.Equal("My.Browser", result.Browser);
+            Assert.Equal("1.2.3", result.BrowserVersion);
+        }
     }
 }

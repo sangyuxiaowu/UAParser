@@ -1686,3 +1686,5 @@ Wget/1.12 (linux-gnu)
 Wget/1.14 (linux-gnu)
 WhatsApp/3.0.0.0 A
 YisouSpider
+Mozilla/5.0 (Phone; OpenHarmony 5.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36 ArkWeb/4.1.6.1 Mobile
+Mozilla/5.0 (Linux; Android 12; HarmonyOS; NAM-AL00; HMSCore 6.14.0.302) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.5735.196 HuaweiBrowser/15.0.7.301 Mobile Safari/537.36
